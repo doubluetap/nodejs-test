@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<link rel="stylesheet" href="/login.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Login</h2>
+
+<p id="message"></p>
+
+<form id="loginForm">
+
+<input type="text" id="username" placeholder="Username" required>
+
+<div class="password-box">
+    <input type="password" id="password" placeholder="Password" required>
+    <span id="togglePassword"></span>
+</div>
+
+<div class="button-group">
+    <button type="submit">Login</button>
+    <a href="/register" class="register-btn">Register</a>
+</div>
+</form>
+
+</div>
+
+<script>
+
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const username = document.getElementById("username").value;
+const password = document.getElementById("password").value;
+
+const res = await fetch("/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({username,password})
+});
+
+const data = await res.json();
+
+if(data.success){
+    window.location.href="/home";
+}else{
+    document.getElementById("message").innerText = data.message;
+}
+
+});
+
+</script>
+
+</body>
+</html>
