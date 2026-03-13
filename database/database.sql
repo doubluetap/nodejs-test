@@ -1,0 +1,23 @@
+CREATE DATABASE IF NOT EXISTS hrm_database;
+USE hrm_database;
+
+CREATE TABLE IF NOT EXISTS roles (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ role_name VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ username VARCHAR(50),
+ password VARCHAR(255),
+ email VARCHAR(100),
+ role_id INT
+);
+INSERT INTO roles (role_name) VALUES
+('Admin'),
+('HR'),
+('Employee');
+CREATE USER IF NOT EXISTS 'test'@'localhost' IDENTIFIED BY '123456';
+CREATE DATABASE IF NOT EXISTS test;
+GRANT ALL PRIVILEGES ON test.* TO 'test'@'localhost';
+FLUSH PRIVILEGES;
