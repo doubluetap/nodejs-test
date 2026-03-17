@@ -1,0 +1,139 @@
+/* Reset nhẹ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Nền */
+body {
+    background: #f4f6f9;
+}
+
+/* Container */
+.container {
+    width: 90%;
+    margin: 30px auto;
+}
+
+/* Title */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Header */
+table th {
+    background: #2c3e50;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+}
+
+/* Row */
+table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Hover */
+table tr:hover {
+    background: #f1f1f1;
+}
+
+/* Select (role) */
+select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Button */
+button {
+    padding: 6px 12px;
+    border: none;
+    background: #3498db;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+/* Close button */
+.close {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* Modal (nếu dùng) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    width: 70%;
+    border-radius: 10px;
+}
+/* Màu role cho dễ nhìn */
+select {
+    font-weight: bold;
+}
+
+/* option màu */
+option[value="admin"] {
+    color: red;
+}
+
+option[value="hr"] {
+    color: green;
+}
+
+option[value="ql"] {
+    color: orange;
+}
+
+option[value="nv"] {
+    color: blue;
+}
+select.role-admin {
+    background: #ffe5e5;
+}
+
+select.role-hr {
+    background: #e5ffe5;
+}
+
+select.role-ql {
+    background: #fff5e5;
+}
+
+select.role-nv {
+    background: #e5f0ff;
+}

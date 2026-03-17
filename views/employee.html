@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Management</title>
+    <link rel="stylesheet" href="/employee.css">
+</head>
+<body>
+
+<h2>👨‍💼 Quản lý nhân viên</h2>
+
+<div class="top-bar">
+    <input type="text" id="search" placeholder="🔍 Tìm nhân viên..." onkeyup="searchEmployee()">
+    <button class="add-btn" onclick="openAdd()">➕ Thêm</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Chức vụ</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody id="employeeTable"></tbody>
+</table>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">✖</span>
+
+        <h3 id="modalTitle">Thêm nhân viên</h3>
+
+        <input type="hidden" id="empId">
+
+        <input type="text" id="name" placeholder="Tên"><br><br>
+
+        <select id="position">
+            <option value="nv">Nhân viên</option>
+            <option value="hr">HR</option>
+            <option value="ql">Quản lý</option>
+        </select><br><br>
+
+        <button onclick="save()">💾 Lưu</button>
+    </div>
+</div>
+
+<script>
+// LOAD DATA
+function loadEmployees() {
+    fetch('/employee')
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById('employeeTable');
+        table.innerHTML = '';
+
+        data.forEach(emp => {
+            table.innerHTML += `
+                <tr>
+                    <td>${emp.id}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.position}</td>
+                    <td>
+                        <button class="edit-btn" onclick="edit(${emp.id}, '${emp.name}', '${emp.position}')">✏️</button>
+                        <button class="delete-btn" onclick="remove(${emp.id})">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+}
+
+// ADD
+function openAdd() {
+    document.getElementById('modalTitle').innerText = 'Thêm nhân viên';
+    document.getElementById('empId').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('position').value = 'nv';
+
+    document.getElementById('modal').style.display = 'flex'; // 🔥 sửa ở đây
+}
+
+// EDIT
+function edit(id, name, position) {
+    document.getElementById('modalTitle').innerText = 'Sửa nhân viên';
+    document.getElementById('empId').value = id;
+    document.getElementById('name').value = name;
+    document.getElementById('position').value = position;
+document.getElementById('modal').style.display = 'flex'; // ✅ đúng
+}
+
+// SAVE
+function save() {
+    const id = document.getElementById('empId').value;
+    const name = document.getElementById('name').value;
+    const position = document.getElementById('position').value;
+
+    const url = id ? '/employee/update' : '/employee/add';
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, position })
+    })
+    .then(() => {
+        closeModal();
+        loadEmployees();
+    });
+}
+
+// DELETE
+function remove(id) {
+    if (!confirm('Xóa nhân viên?')) return;
+
+    fetch('/employee/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+    })
+    .then(() => loadEmployees());
+}
+
+// SEARCH
+function searchEmployee() {
+    const keyword = document.getElementById('search').value.toLowerCase();
+    const rows = document.querySelectorAll('#employeeTable tr');
+
+    rows.forEach(row => {
+        const name = row.children[1].innerText.toLowerCase();
+        row.style.display = name.includes(keyword) ? '' : 'none';
+    });
+}
+
+// CLOSE
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+// LOAD
+window.onload = loadEmployees;
+</script>
+
+</body>
+</html>

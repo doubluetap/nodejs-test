@@ -1,14 +1,214 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+    <title>HRM Dashboard</title>
+    <link rel="stylesheet" href="/home.css">
 </head>
 
 <body>
 
-<h1>Welcome Home</h1>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>HRM</h2>
 
-<p>Bạn đã đăng nhập thành công</p>
+    <a href="#" onclick="showSection('dashboard')">📊 Dashboard</a>
+    <a href="#" onclick="showSection('nhanvien')" id="employeeMenu">👨‍💼 Nhân viên</a>
+    <a href="#" onclick="showSection('chamcong')">⏰ Chấm công</a>
+    <a href="#" onclick="openEmployee()">📋 Quản lý NV</a>
+    <a href="#" onclick="openAdmin()" id="adminMenu">🔐 Phân quyền</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="user-info">
+            👤 <span id="username">User</span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="section">
+            <div class="grid">
+                <div class="card">
+                    <h3>Nhân viên</h3>
+                    <p>Quản lý thông tin nhân viên</p>
+                </div>
+
+                <div class="card">
+                    <h3>Chấm công</h3>
+                    <p>Check in / Check out</p>
+                </div>
+
+                <div class="card">
+                    <h3>Quản lý</h3>
+                    <p>Quản lý hệ thống</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- NHÂN VIÊN -->
+        <div id="nhanvien" class="section">
+            📋 Đây là quản lý nhân viên
+        </div>
+
+        <!-- CHẤM CÔNG -->
+        <div id="chamcong" class="section">
+            ⏰ Đây là chấm công
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= MODAL EMPLOYEE ================= -->
+<div id="employeeModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEmployeeModal()">✖</span>
+        <iframe id="employeeFrame"></iframe>
+    </div>
+</div>
+
+<!-- ================= MODAL ADMIN ================= -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">✖</span>
+        <iframe id="adminFrame"></iframe>
+    </div>
+</div>
+
+<script>
+
+// =====================
+// HIỂN THỊ SECTION
+// =====================
+function showSection(id) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(sec => sec.style.display = 'none');
+
+    document.getElementById(id).style.display = 'block';
+}
+
+// =====================
+// LOAD USER
+// =====================
+function loadUser() {
+    fetch('/user', { credentials: 'include' })
+    .then(res => res.json())
+    .then(user => {
+        if (user) {
+            document.getElementById('username').innerText = user.username;
+        }
+    });
+}
+
+// =====================
+// CHECK ROLE ADMIN
+// =====================
+function checkRole() {
+    fetch('/admin/check', { credentials: 'include' })
+    .then(res => res.text())
+    .then(data => {
+        if (data !== 'ok') {
+            document.getElementById('adminMenu').style.display = 'none';
+        }
+    });
+}
+
+// =====================
+// CHECK ROLE EMPLOYEE
+// =====================
+function checkEmployeeRole() {
+    fetch('/employee/check', { credentials: 'include' })
+    .then(res => res.text())
+    .then(data => {
+        if (data !== 'ok') {
+            document.getElementById('employeeMenu').style.display = 'none';
+        }
+    });
+}
+
+// =====================
+// LOAD MẶC ĐỊNH
+// =====================
+window.onload = () => {
+    showSection('dashboard');
+    checkRole();
+    checkEmployeeRole();
+    loadUser();
+};
+
+// =====================
+// ADMIN
+// =====================
+function openAdmin() {
+    fetch('/admin/check', { credentials: 'include' })
+    .then(res => res.text())
+    .then(data => {
+        if (data !== 'ok') {
+            alert('❌ Chỉ admin mới vào được!');
+            return;
+        }
+
+        document.getElementById('adminModal').style.display = 'flex';
+        document.getElementById('adminFrame').src = '/admin.html';
+    });
+}
+
+function closeModal() {
+    document.getElementById('adminModal').style.display = 'none';
+    document.getElementById('adminFrame').src = '';
+}
+
+// =====================
+// EMPLOYEE
+// =====================
+function openEmployee() {
+    fetch('/employee/check', { credentials: 'include' })
+    .then(res => res.text())
+    .then(data => {
+        if (data !== 'ok') {
+            alert('❌ Chỉ admin hoặc HR!');
+            return;
+        }
+
+        document.getElementById('employeeModal').style.display = 'flex';
+        document.getElementById('employeeFrame').src = '/employee.html';
+    });
+}
+
+function closeEmployeeModal() {
+    document.getElementById('employeeModal').style.display = 'none';
+    document.getElementById('employeeFrame').src = '';
+}
+
+// =====================
+// CLICK NGOÀI ĐÓNG
+// =====================
+window.onclick = function(event) {
+    if (event.target.id === 'adminModal') closeModal();
+    if (event.target.id === 'employeeModal') closeEmployeeModal();
+}
+
+// =====================
+// LOGOUT
+// =====================
+function logout() {
+    fetch('/logout', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(() => {
+        window.location.href = '/login';
+    });
+}
+
+</script>
 
 </body>
 </html>

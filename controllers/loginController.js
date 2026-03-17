@@ -24,6 +24,9 @@ message:"Sai mật khẩu"
 });
 }
 
+        req.session.user = user;
+
+
 res.json({
 success:true,
 message:"Đăng nhập thành công"

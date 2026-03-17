@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Phân quyền</title>
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>🔐 Quản lý phân quyền</h2>
+
+    <div id="userTable">⏳ Đang tải...</div>
+</div>
+
+<script>
+// =======================
+// LOAD USER
+// =======================
+function loadUsers() {
+    fetch('/admin/users', {
+        credentials: 'include' // 🔥 thêm cái này cho chắc session
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        let html = `
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+            </tr>
+        `;
+
+        data.forEach(user => {
+            html += `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+               <td>
+                        <select class="role-${user.role}" onchange="updateRole('${user.username}', this.value)">
+                        <option value="admin" ${user.role==='admin'?'selected':''}>admin</option>
+                        <option value="hr" ${user.role==='hr'?'selected':''}>hr</option>
+                        <option value="ql" ${user.role==='ql'?'selected':''}>ql</option>
+                        <option value="nv" ${user.role==='nv'?'selected':''}>nv</option>
+                    </select>
+                </td>
+            </tr>
+            `;
+        });
+
+        html += '</table>';
+        document.getElementById('userTable').innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById('userTable').innerHTML = "❌ Lỗi load dữ liệu";
+    });
+}
+
+// =======================
+// UPDATE ROLE
+// =======================
+function updateRole(username, role) {
+    fetch('/admin/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // 🔥 thêm luôn
+        body: JSON.stringify({ username, role })
+    })
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
+        loadUsers();
+    })
+    .catch(() => {
+        alert('❌ Lỗi cập nhật!');
+    });
+}
+
+// =======================
+// LOAD
+// =======================
+loadUsers();
+</script>
+
+</body>
+</html>
