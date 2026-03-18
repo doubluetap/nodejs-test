@@ -1,8 +1,15 @@
-CREATE DATABASE IF NOT EXISTS  test;
+CREATE DATABASE IF NOT EXISTS test;
 USE test;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50),
-  password VARCHAR(50)
+  password VARCHAR(50),
+  role VARCHAR(20) DEFAULT 'nv'
+);
+CREATE TABLE IF NOT EXISTS employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    position VARCHAR(100),
+    salary INT
 );
