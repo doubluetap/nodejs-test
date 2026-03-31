@@ -10,15 +10,17 @@
 
 <div class="top-bar">
     <input type="text" id="search" placeholder="🔍 Tìm nhân viên..." onkeyup="searchEmployee()">
-    <button class="add-btn" onclick="openAdd()">➕ Thêm</button>
+    <button onclick="openAdd()">➕ Thêm</button>
 </div>
 
-<table>
+<table border="1">
     <thead>
         <tr>
             <th>ID</th>
+            <th>Username</th> <!-- ✅ thêm -->
             <th>Tên</th>
             <th>Chức vụ</th>
+            <th>Lương</th>
             <th>Hành động</th>
         </tr>
     </thead>
@@ -26,28 +28,31 @@
 </table>
 
 <!-- MODAL -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">✖</span>
+<div id="modal" style="display:none;">
+    <h3 id="modalTitle"></h3>
 
-        <h3 id="modalTitle">Thêm nhân viên</h3>
+    <input type="hidden" id="empId">
 
-        <input type="hidden" id="empId">
+    <label>User:</label>
+    <select id="user_id"></select><br><br> <!-- ✅ thêm -->
 
-        <input type="text" id="name" placeholder="Tên"><br><br>
+    <input type="text" id="name" placeholder="Tên"><br><br>
 
-        <select id="position">
-            <option value="nv">Nhân viên</option>
-            <option value="hr">HR</option>
-            <option value="ql">Quản lý</option>
-        </select><br><br>
+    <select id="position">
+        <option value="nv">Nhân viên</option>
+        <option value="hr">HR</option>
+        <option value="ql">Quản lý</option>
+    </select><br><br>
 
-        <button onclick="save()">💾 Lưu</button>
-    </div>
+    <input type="number" id="salary" placeholder="Lương"><br><br>
+
+    <button onclick="save()">💾 Lưu</button>
+    <button onclick="closeModal()">❌ Hủy</button>
 </div>
 
 <script>
-// LOAD DATA
+
+// ================= LOAD EMPLOYEE =================
 function loadEmployees() {
     fetch('/employee')
     .then(res => res.json())
@@ -59,11 +64,13 @@ function loadEmployees() {
             table.innerHTML += `
                 <tr>
                     <td>${emp.id}</td>
+                    <td>${emp.username || ''}</td> <!-- join -->
                     <td>${emp.name}</td>
                     <td>${emp.position}</td>
+                    <td>${emp.salary}</td>
                     <td>
-                        <button class="edit-btn" onclick="edit(${emp.id}, '${emp.name}', '${emp.position}')">✏️</button>
-                        <button class="delete-btn" onclick="remove(${emp.id})">🗑️</button>
+                        <button onclick="edit(${emp.id}, \`${emp.name}\`, \`${emp.position}\`, ${emp.salary}, ${emp.user_id || 'null'})">✏️</button>
+                        <button onclick="remove(${emp.id})">🗑️</button>
                     </td>
                 </tr>
             `;
@@ -71,74 +78,110 @@ function loadEmployees() {
     });
 }
 
-// ADD
+// ================= LOAD USERS =================
+function loadUsers(selectedId = null) {
+    fetch('/admin/users')
+    .then(res => res.json())
+    .then(data => {
+        const select = document.getElementById('user_id');
+        select.innerHTML = '';
+
+        data.forEach(user => {
+            select.innerHTML += `
+                <option value="${user.id}" ${user.id === selectedId ? 'selected' : ''}>
+                    ${user.username}
+                </option>
+            `;
+        });
+    });
+}
+
+// ================= ADD =================
 function openAdd() {
-    document.getElementById('modalTitle').innerText = 'Thêm nhân viên';
+    document.getElementById('modalTitle').innerText = 'Thêm';
     document.getElementById('empId').value = '';
     document.getElementById('name').value = '';
     document.getElementById('position').value = 'nv';
+    document.getElementById('salary').value = '';
 
-    document.getElementById('modal').style.display = 'flex'; // 🔥 sửa ở đây
+    loadUsers();
+
+    document.getElementById('modal').style.display = 'block';
 }
 
-// EDIT
-function edit(id, name, position) {
-    document.getElementById('modalTitle').innerText = 'Sửa nhân viên';
+// ================= EDIT =================
+function edit(id, name, position, salary, user_id) {
+    document.getElementById('modalTitle').innerText = 'Sửa';
     document.getElementById('empId').value = id;
     document.getElementById('name').value = name;
     document.getElementById('position').value = position;
-document.getElementById('modal').style.display = 'flex'; // ✅ đúng
+    document.getElementById('salary').value = salary;
+
+    loadUsers(user_id);
+
+    document.getElementById('modal').style.display = 'block';
 }
 
-// SAVE
+// ================= SAVE =================
 function save() {
     const id = document.getElementById('empId').value;
     const name = document.getElementById('name').value;
     const position = document.getElementById('position').value;
+    const salary = document.getElementById('salary').value;
+    const user_id = document.getElementById('user_id').value;
 
     const url = id ? '/employee/update' : '/employee/add';
 
     fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name, position })
+        body: JSON.stringify({
+            id: Number(id),
+            name,
+            position,
+            salary: Number(salary),
+            user_id: Number(user_id)
+        })
     })
-    .then(() => {
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
         closeModal();
         loadEmployees();
     });
 }
 
-// DELETE
+// ================= DELETE =================
 function remove(id) {
-    if (!confirm('Xóa nhân viên?')) return;
-
     fetch('/employee/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id: Number(id) })
     })
-    .then(() => loadEmployees());
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
+        loadEmployees();
+    });
 }
 
-// SEARCH
+// ================= SEARCH =================
 function searchEmployee() {
     const keyword = document.getElementById('search').value.toLowerCase();
     const rows = document.querySelectorAll('#employeeTable tr');
 
     rows.forEach(row => {
-        const name = row.children[1].innerText.toLowerCase();
+        const name = row.children[2].innerText.toLowerCase();
         row.style.display = name.includes(keyword) ? '' : 'none';
     });
 }
 
-// CLOSE
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
-// LOAD
 window.onload = loadEmployees;
+
 </script>
 
 </body>

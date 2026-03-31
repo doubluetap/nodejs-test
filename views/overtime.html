@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tăng ca</title>
+    <link rel="stylesheet" href="/overtime.css">
+</head>
+<body>
+
+<!-- ===== ADMIN / QL ===== -->
+<div id="adminSection" style="display:none;">
+    <h3>Danh sách yêu cầu</h3>
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>NV</th>
+                <th>Ngày</th>
+                <th>Giờ</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="list"></tbody>
+    </table>
+</div>
+
+<!-- ===== FORM ===== -->
+<div class="container">
+    <h2>Đăng ký tăng ca</h2>
+
+    <form id="overtimeForm">
+        <input type="date" id="date" required>
+        <input type="time" id="start_time" required>
+        <input type="time" id="end_time" required>
+        <textarea id="reason" placeholder="Nhập lý do..."></textarea>
+        <button type="submit">Gửi yêu cầu</button>
+    </form>
+
+    <div id="message" class="message"></div>
+</div>
+
+<script>
+
+// ===== GLOBAL USER =====
+let currentUser = null;
+
+// ===== CHECK ROLE =====
+async function checkRole() {
+    const res = await fetch('/user', { credentials: 'include' });
+    const user = await res.json();
+
+    currentUser = user;
+
+    // 👉 chỉ QL + HR thấy bảng
+    if (user && (user.role === 'ql' || user.role === 'admin')) {
+        document.getElementById("adminSection").style.display = "block";
+        loadList();
+    }
+}
+
+// ===== LOAD LIST =====
+async function loadList() {
+    const res = await fetch('/api/overtime/pending', {
+        credentials: 'include'
+    });
+
+    const data = await res.json();
+
+    const table = document.getElementById("list");
+    table.innerHTML = "";
+
+    data.forEach(item => {
+        table.innerHTML += `
+            <tr>
+                <td>${item.name}</td>
+                <td>${item.date}</td>
+                <td>${item.start_time} - ${item.end_time}</td>
+                <td>${item.status}</td>
+                <td>
+                    <button onclick="approve(${item.id})">✔</button>
+                    <button onclick="reject(${item.id})">❌</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+// ===== APPROVE =====
+async function approve(id) {
+    await fetch(`/api/overtime/${id}/approve`, {
+        method: "PUT",
+        credentials: "include"
+    });
+
+    loadList();
+}
+
+// ===== REJECT =====
+async function reject(id) {
+    const reason = prompt("Lý do từ chối:");
+
+    if (!reason) return;
+
+    await fetch(`/api/overtime/${id}/reject`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({ reason })
+    });
+
+    loadList();
+}
+
+// ===== SUBMIT =====
+document.getElementById("overtimeForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const msg = document.getElementById("message");
+
+    const res = await fetch("/api/overtime", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            date: document.getElementById("date").value,
+            start_time: document.getElementById("start_time").value,
+            end_time: document.getElementById("end_time").value,
+            reason: document.getElementById("reason").value
+        })
+    });
+
+    const result = await res.json();
+
+    // 👉 KHÔNG dùng alert (fix iframe bug)
+    if (res.ok) {
+        msg.innerText = "✅ " + result.message;
+        msg.className = "message success";
+
+        // reset form
+        document.getElementById("overtimeForm").reset();
+
+        // reload list nếu là QL/HR
+        if (currentUser && (currentUser.role === 'ql' || currentUser.role === 'admin')) {
+            loadList();
+        }
+
+    } else {
+        msg.innerText = "❌ " + result.message;
+        msg.className = "message error";
+    }
+});
+
+// INIT
+checkRole();
+
+</script>
+
+</body>
+</html>

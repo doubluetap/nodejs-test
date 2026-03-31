@@ -22,3 +22,10 @@ exports.createUser = (username,password,callback)=>{
 
 };
 
+exports.createEmployee = (name, userId, callback) => {
+    const sql = "INSERT INTO employees(name, user_id) VALUES (?,?)";
+    db.query(sql, [name, userId], (err, result) => {
+        if(err) throw err;
+        callback();
+    });
+}

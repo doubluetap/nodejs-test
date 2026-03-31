@@ -18,4 +18,6 @@ router.get('/users', adminController.getUsers);
 // cập nhật role
 router.post('/update', adminController.updateRole);
 
+router.post('/delete', adminController.deleteUser);
+
 module.exports = router;

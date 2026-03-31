@@ -1,82 +1,95 @@
 const db = require("../config/db");
 
-// =======================
-// CHECK ROLE (admin + hr)
-// =======================
-function checkRole(req, res) {
-    if (!req.session.user || 
-       (req.session.user.role !== 'admin' && req.session.user.role !== 'hr')) {
-        return false;
-    }
-    return true;
+// CHECK ROLE
+function checkRole(req) {
+    return req.session.user &&
+        (req.session.user.role === "admin" || req.session.user.role === "hr");
 }
 
-// =======================
-// GET ALL
-// =======================
+// ================= GET =================
 exports.getEmployees = (req, res) => {
-    if (!checkRole(req, res)) return res.send("forbidden");
+    if (!checkRole(req)) return res.send("forbidden");
 
-    db.query("SELECT * FROM employees", (err, data) => {
+    const sql = `
+        SELECT e.*, u.username 
+        FROM employees e
+        LEFT JOIN users u ON e.user_id = u.id
+    `;
+
+    db.query(sql, (err, data) => {
         if (err) return res.send(err);
         res.json(data);
     });
 };
 
-// =======================
-// ADD
-// =======================
+// ================= ADD =================
 exports.addEmployee = (req, res) => {
-    if (!checkRole(req, res)) return res.send("forbidden");
+    if (!checkRole(req)) return res.send("forbidden");
 
-    const { name, position, salary } = req.body;
+    const { name, position, salary, user_id } = req.body;
 
     db.query(
-        "INSERT INTO employees (name, position, salary) VALUES (?, ?, ?)",
-        [name, position, salary],
+        "INSERT INTO employees (name, position, salary, user_id) VALUES (?, ?, ?, ?)",
+        [name, position, salary, user_id],
         (err) => {
-            if (err) return res.send("❌ Lỗi thêm");
+            if (err) {
+                console.log(err);
+                return res.send("❌ Lỗi thêm");
+            }
             res.send("✅ Thêm thành công");
         }
     );
 };
 
-// =======================
-// UPDATE
-// =======================
+// ================= UPDATE =================
 exports.updateEmployee = (req, res) => {
-    if (!checkRole(req, res)) return res.send("forbidden");
+    if (!checkRole(req)) return res.send("forbidden");
 
-    const { id, name, position, salary } = req.body;
+    const { id, name, position, salary, user_id } = req.body;
 
     db.query(
-        "UPDATE employees SET name=?, position=?, salary=? WHERE id=?",
-        [name, position, salary, id],
-        (err) => {
-            if (err) return res.send("❌ Lỗi sửa");
+        "UPDATE employees SET name=?, position=?, salary=?, user_id=? WHERE id=?",
+        [name, position, salary, user_id, id],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.send("❌ Lỗi sửa");
+            }
+
+            if (result.affectedRows === 0) {
+                return res.send("⚠️ Không tìm thấy nhân viên");
+            }
+
             res.send("✅ Cập nhật thành công");
         }
     );
 };
 
-// =======================
-// DELETE
-// =======================
+// ================= DELETE =================
 exports.deleteEmployee = (req, res) => {
-    if (!checkRole(req, res)) return res.send("forbidden");
+    if (!checkRole(req)) return res.send("forbidden");
 
-    const { id } = req.body;
+    let { id } = req.body;
+    id = parseInt(id);
+
+    if (!id) {
+        return res.send("❌ ID không hợp lệ");
+    }
 
     db.query(
         "DELETE FROM employees WHERE id=?",
         [id],
-        (err) => {
-            if (err) return res.send("❌ Lỗi xóa");
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.send("❌ Lỗi xóa");
+            }
+
+            if (result.affectedRows === 0) {
+                return res.send("⚠️ Không tìm thấy nhân viên");
+            }
+
             res.send("✅ Xóa thành công");
         }
     );
-    function checkRole(req) {
-    return req.session.user &&
-           (req.session.user.role === 'admin' || req.session.user.role === 'hr');
-}
 };

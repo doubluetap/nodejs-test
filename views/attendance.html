@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance</title>
+    <link rel="stylesheet" href="/attendance.css">
+</head>
+
+<body>
+<div id="workDaysBox" style="font-size:20px; font-weight:bold;">
+    🗓️ Ngày công: <span id="workDays">0</span>/30
+</div>
+<h2>⏰ Chấm công</h2>
+
+<button onclick="checkIn()">Check-in</button>
+<button onclick="checkOut()">Check-out</button>
+
+<h3>Lịch sử hôm nay</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Ngày</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+        </tr>
+    </thead>
+    <tbody id="table"></tbody>
+</table>
+
+<h3>📊 Tổng hợp ngày công</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Ngày công</th>
+        </tr>
+    </thead>
+    <tbody id="summaryTable"></tbody>
+</table>
+
+<script>
+// LOAD
+function load() {
+    fetch('/attendance/today')
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById('table');
+        table.innerHTML = '';
+
+        data.forEach(row => {
+
+            const date = row.date 
+                ? new Date(row.date).toLocaleDateString() 
+                : '';
+
+            const checkIn = row.check_in 
+                ? new Date(row.check_in).toLocaleString() 
+                : '';
+
+            const checkOut = row.check_out 
+                ? new Date(row.check_out).toLocaleString() 
+                : '';
+
+            table.innerHTML += `
+                <tr>
+                    <td>${date}</td>
+                    <td>${checkIn}</td>
+                    <td>${checkOut}</td>
+                </tr>
+            `;
+        });
+    });
+}
+
+// CHECK-IN
+function checkIn() {
+    fetch('/attendance/checkin', { method: 'POST' })
+    .then(res => res.text())
+    .then(msg => {
+        console.log(msg);
+        load();
+        loadWorkDays(); // 🔥 thêm dòng này
+    });
+}
+
+// CHECK-OUT
+function checkOut() {
+    fetch('/attendance/checkout', { method: 'POST' })
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
+        load();
+    });
+}
+
+function loadWorkDays() {
+    fetch('/attendance/workdays')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('workDays').innerText = data.workDays;
+    });
+}
+
+function loadSummary() {
+    fetch('/attendance/summary')
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById('summaryTable');
+        table.innerHTML = '';
+
+        data.forEach(emp => {
+            table.innerHTML += `
+                <tr>
+                    <td>${emp.name}</td>
+                    <td>${emp.work_days}/30</td>
+                </tr>
+            `;
+        });
+    });
+}
+
+window.onload = () => {
+    load();
+    loadWorkDays(); // 🔥 thêm
+    loadSummary();
+};
+</script>
+
+</body>
+</html>

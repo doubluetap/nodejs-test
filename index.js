@@ -45,6 +45,14 @@ app.use('/employee', require('./routes/employee'));
 app.get('/employee.html', (req, res) => {
     res.sendFile(__dirname + '/views/employee.html');
 });
+
+app.get('/attendance.html', (req, res) => {
+    res.sendFile(__dirname + '/views/attendance.html');
+});
+const attendanceRoute = require("./routes/attendance");
+
+app.use("/attendance", attendanceRoute);
+
 app.post('/logout', (req, res) => {
     req.session.destroy(() => {
         res.send('ok');
@@ -54,6 +62,14 @@ app.get('/user', (req, res) => {
     if (!req.session.user) return res.send(null);
     res.json(req.session.user);
 });
+
+// overtime html
+app.get('/overtime.html', (req, res) => {
+    res.sendFile(__dirname + '/views/overtime.html');
+});
+
+// overtime api
+app.use("/api/overtime", require("./routes/overtime"));
 // start server
 app.listen(3000, () => {
     console.log("Server running http://localhost:3000/login");

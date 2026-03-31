@@ -45,6 +45,9 @@ function loadUsers() {
                         <option value="nv" ${user.role==='nv'?'selected':''}>nv</option>
                     </select>
                 </td>
+                <td>
+                    <button onclick="deleteUser('${user.username}')">🗑️ Xóa</button>
+                </td>
             </tr>
             `;
         });
@@ -74,6 +77,23 @@ function updateRole(username, role) {
     })
     .catch(() => {
         alert('❌ Lỗi cập nhật!');
+    });
+}
+function deleteUser(username) {
+
+    // ❌ bỏ confirm
+    // if (!confirm(...)) return;
+
+    fetch('/admin/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username })
+    })
+    .then(res => res.text())
+    .then(msg => {
+        console.log(msg); // hoặc hiển thị ra UI
+        loadUsers();
     });
 }
 

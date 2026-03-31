@@ -48,3 +48,36 @@ exports.updateRole = (req, res) => {
         }
     );
 };
+// =======================
+// DELETE USER
+// =======================
+exports.deleteUser = (req, res) => {
+    const { username } = req.body;
+
+    // check login + quyền
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.send('❌ Không có quyền');
+    }
+
+    // 🔥 CHẶN TỰ XÓA CHÍNH MÌNH (đặt ở đây)
+    if (username === req.session.user.username) {
+        return res.send('⚠️ Không thể tự xóa chính mình');
+    }
+
+    db.query(
+        'DELETE FROM users WHERE username = ?',
+        [username],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.send('❌ Lỗi xóa');
+            }
+
+            if (result.affectedRows === 0) {
+                return res.send('⚠️ Không tìm thấy user');
+            }
+
+            res.send('✅ Xóa thành công');
+        }
+    );
+};
