@@ -67,24 +67,32 @@ exports.checkOut = (req, res) => {
     const userId = req.session.user.id;
 
     db.query(
-        `UPDATE attendance 
-         SET check_out = NOW() 
-         WHERE employee_id=? 
-         AND check_out IS NULL
-         ORDER BY check_in DESC 
-         LIMIT 1`,
+        "SELECT id FROM employees WHERE user_id = ?",
         [userId],
         (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.send("❌ Lỗi check-out");
+
+            if (err || result.length === 0) {
+                return res.send("❌ Không tìm thấy employee");
             }
 
-            if (result.affectedRows === 0) {
-                return res.send("⚠️ Không có phiên check-in nào");
-            }
+            const employeeId = result[0].id;
 
-            res.send("✅ Check-out thành công");
+            db.query(
+                `UPDATE attendance 
+                 SET check_out = NOW() 
+                 WHERE employee_id=? 
+                 AND check_out IS NULL
+                 ORDER BY check_in DESC 
+                 LIMIT 1`,
+                [employeeId],
+                (err, result) => {
+                    if (err) return res.send("❌ Lỗi check-out");
+                    if (result.affectedRows === 0) {
+                        return res.send("⚠️ Không có phiên check-in nào");
+                    }
+                    res.send("✅ Check-out thành công");
+                }
+            );
         }
     );
 };

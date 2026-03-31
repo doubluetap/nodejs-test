@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nghỉ phép</title>
+    <link rel="stylesheet" href="/leave.css">
+</head>
+<body>
+
+<h2>Quản lý nghỉ phép</h2>
+
+<!-- TẠO ĐƠN -->
+<div>
+    <h3>Gửi đơn</h3>
+    <form id="leaveForm">
+        <select id="type">
+            <option value="ANNUAL">Phép năm</option>
+            <option value="SICK">Nghỉ ốm</option>
+        </select><br><br>
+
+        <input type="date" id="startDate"><br><br>
+        <input type="date" id="endDate"><br><br>
+
+        <input type="text" id="reason" placeholder="Lý do"><br><br>
+
+        <button type="submit">Gửi</button>
+    </form>
+</div>
+
+<hr>
+
+<!-- DUYỆT -->
+<div id="approveSection" style="display:none;">
+    <h3>Duyệt đơn</h3>
+    <div id="leaveList"></div>
+</div>
+
+<script>
+// gửi đơn
+document.getElementById("leaveForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const data = {
+        type: document.getElementById("type").value,
+        startDate: document.getElementById("startDate").value,
+        endDate: document.getElementById("endDate").value,
+        reason: document.getElementById("reason").value
+    };
+
+    const res = await fetch("/leave", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    console.log("Đã gửi đơn");
+});
+
+// load role
+async function loadRole() {
+    const res = await fetch("/user");
+    const user = await res.json();
+
+    if (user.role === 'ql' || user.role === 'hr') {
+        document.getElementById("approveSection").style.display = "block";
+        loadLeaves();
+    }
+}
+
+// load danh sách
+async function loadLeaves() {
+    const res = await fetch("/leave/pending");
+    const data = await res.json();
+
+    const div = document.getElementById("leaveList");
+    div.innerHTML = "";
+
+    data.forEach(l => {
+        div.innerHTML += `
+            <div>
+                <b>${l.name}</b><br>
+                ${l.start_date} → ${l.end_date}<br>
+                ${l.reason}<br>
+
+                <button onclick="approve(${l.id})">Duyệt</button>
+                <button onclick="reject(${l.id})">Từ chối</button>
+                <hr>
+            </div>
+        `;
+    });
+}
+
+async function approve(id) {
+    await fetch("/leave/" + id + "/approve", { method: "POST" });
+    loadLeaves();
+}
+
+async function reject(id) {
+    const reason = prompt("Lý do:");
+    await fetch("/leave/" + id + "/reject", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({reasonReject: reason})
+    });
+    loadLeaves();
+}
+
+loadRole();
+</script>
+
+</body>
+</html>

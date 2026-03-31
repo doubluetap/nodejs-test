@@ -70,7 +70,20 @@ app.get('/overtime.html', (req, res) => {
 
 // overtime api
 app.use("/api/overtime", require("./routes/overtime"));
+
+app.get('/salary.html', (req, res) => {
+    res.sendFile(__dirname + '/views/salary.html');
+});
 // start server
+const salaryRoutes = require("./routes/salary");
+
+// leave api
+app.use("/leave", require("./routes/leave"));
+app.get('/leave.html', (req, res) => {
+    res.sendFile(__dirname + '/views/leave.html');
+});
+app.use("/salary", salaryRoutes);
+
 app.listen(3000, () => {
     console.log("Server running http://localhost:3000/login");
 });

@@ -14,6 +14,8 @@
     <a href="#" onclick="showSection('dashboard')">📊 Dashboard</a>
     <a href="#" onclick="openAttendance()">⏰ Chấm công</a>
     <a href="#" onclick="openOvertime()">⏱️ Tăng ca</a>
+    <a href="#" onclick="openSalary()">💰 Tính lương</a>
+    <a href="#" onclick="openLeave()">📝 Nghỉ phép</a>
     <a href="#" onclick="openEmployee()">📋 Quản lý NV</a>
     <a href="#" onclick="openAdmin()" id="adminMenu">🔐 Phân quyền</a>
 </div>
@@ -95,6 +97,22 @@
     <div class="modal-content">
         <span class="close" onclick="closeOvertimeModal()">✖</span>
         <iframe id="overtimeFrame"></iframe>
+    </div>
+</div>
+
+<!-- ================= MODAL SALARY ================= -->
+<div id="salaryModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeSalaryModal()">✖</span>
+        <iframe id="salaryFrame"></iframe>
+    </div>
+</div>
+
+<!-- ================= MODAL LEAVE ================= -->
+<div id="leaveModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeLeaveModal()">✖</span>
+        <iframe id="leaveFrame"></iframe>
     </div>
 </div>
 
@@ -237,13 +255,41 @@ function closeOvertimeModal() {
 }
 
 // =====================
+// SALARY
+// =====================
+function openSalary() {
+    document.getElementById('salaryModal').style.display = 'flex';
+    document.getElementById('salaryFrame').src = '/salary.html';
+}
+
+function closeSalaryModal() {
+    document.getElementById('salaryModal').style.display = 'none';
+    document.getElementById('salaryFrame').src = '';
+}
+
+// =====================
+// LEAVE
+// =====================
+function openLeave() {
+    document.getElementById('leaveModal').style.display = 'flex';
+    document.getElementById('leaveFrame').src = '/leave.html';
+}
+
+function closeLeaveModal() {
+    document.getElementById('leaveModal').style.display = 'none';
+    document.getElementById('leaveFrame').src = '';
+}
+
+// =====================
 // CLICK NGOÀI ĐÓNG
 // =====================
 window.onclick = function(event) {
     if (event.target.id === 'adminModal') closeModal();
     if (event.target.id === 'employeeModal') closeEmployeeModal();
     if (event.target.id === 'attendanceModal') closeAttendanceModal();
-    if (event.target.id === 'overtimeModal') closeOvertimeModal(); // thêm dòng này
+    if (event.target.id === 'overtimeModal') closeOvertimeModal();
+    if (event.target.id === 'salaryModal') closeSalaryModal(); // ✅ thêm dòng này
+    if (event.target.id === 'leaveModal') closeLeaveModal();
 }
 
 // =====================

@@ -96,8 +96,7 @@ async function approve(id) {
 
 // ===== REJECT =====
 async function reject(id) {
-    const reason = prompt("Lý do từ chối:");
-
+        const reason = document.getElementById("rejectReason").value;
     if (!reason) return;
 
     await fetch(`/api/overtime/${id}/reject`, {

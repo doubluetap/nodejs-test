@@ -87,8 +87,9 @@ function checkOut() {
     fetch('/attendance/checkout', { method: 'POST' })
     .then(res => res.text())
     .then(msg => {
-        alert(msg);
+        console.log(msg);
         load();
+        loadWorkDays();
     });
 }
 

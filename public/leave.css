@@ -1,0 +1,206 @@
+/* leave.css - Phiên bản đẹp hơn */
+
+/* Body */
+body {
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+  color: #2c3e50;
+  margin: 30px;
+  padding: 0;
+}
+
+/* Tiêu đề chính */
+h2 {
+  text-align: center;
+  font-weight: 700;
+  font-size: 2.8rem;
+  margin-bottom: 40px;
+  color: #00796b;
+  text-shadow: 1px 1px 2px #b2dfdb;
+}
+
+/* Form gửi đơn */
+form {
+  max-width: 450px;
+  margin: 0 auto 50px auto;
+  background: #ffffffcc; /* chút trong suốt */
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 12px 25px rgba(0, 121, 107, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+form:hover {
+  box-shadow: 0 18px 35px rgba(0, 121, 107, 0.25);
+}
+
+form h3 {
+  font-weight: 600;
+  margin-bottom: 25px;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+  color: #004d40;
+  border-bottom: 2px solid #00796b;
+  padding-bottom: 8px;
+}
+
+/* Các input, select */
+input[type="date"],
+input[type="text"],
+select {
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  border: 2px solid #00796b;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #004d40;
+  background-color: #e0f2f1;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+input[type="date"]:focus,
+input[type="text"]:focus,
+select:focus {
+  border-color: #004d40;
+  background-color: #b2dfdb;
+  outline: none;
+  box-shadow: 0 0 8px #004d40aa;
+}
+
+/* Nút gửi */
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(45deg, #00796b, #004d40);
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 15px 0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.4s ease, transform 0.15s ease;
+  box-shadow: 0 6px 10px rgba(0, 121, 107, 0.3);
+}
+
+button[type="submit"]:hover {
+  background: linear-gradient(45deg, #004d40, #00796b);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 77, 64, 0.5);
+}
+
+/* Khu vực duyệt đơn */
+#approveSection {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #ffffffcc;
+  padding: 30px 35px;
+  border-radius: 14px;
+  box-shadow: 0 15px 30px rgba(0, 121, 107, 0.12);
+}
+
+#approveSection h3 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #004d40;
+  font-weight: 700;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #00796b;
+  padding-bottom: 12px;
+}
+
+/* Danh sách đơn nghỉ */
+#leaveList > div {
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  background: #e0f2f1;
+  border-radius: 12px;
+  box-shadow: inset 0 0 6px #004d4075;
+  transition: background-color 0.3s ease;
+}
+
+#leaveList > div:hover {
+  background-color: #b2dfdb;
+}
+
+/* Tên nhân viên */
+#leaveList b {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #00796b;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Thông tin đơn nghỉ */
+#leaveList div > br {
+  display: none;
+}
+
+#leaveList div {
+  font-size: 0.95rem;
+  color: #004d40cc;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+/* Nút duyệt và từ chối */
+#leaveList button {
+  padding: 8px 20px;
+  margin-right: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  box-shadow: 0 4px 8px rgba(0, 121, 107, 0.25);
+  user-select: none;
+}
+
+#leaveList button:first-of-type {
+  background-color: #2e7d32;
+  color: #e0f2f1;
+}
+
+#leaveList button:first-of-type:hover {
+  background-color: #1b5e20;
+  transform: scale(1.07);
+  box-shadow: 0 6px 14px rgba(27, 94, 32, 0.6);
+}
+
+#leaveList button:last-of-type {
+  background-color: #c62828;
+  color: #fce4ec;
+}
+
+#leaveList button:last-of-type:hover {
+  background-color: #8e0000;
+  transform: scale(1.07);
+  box-shadow: 0 6px 14px rgba(142, 0, 0, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  body {
+    margin: 15px;
+  }
+
+  form, #approveSection {
+    width: 95%;
+    padding: 20px 25px;
+  }
+
+  button[type="submit"] {
+    font-size: 1rem;
+    padding: 12px 0;
+  }
+
+  #leaveList button {
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    margin-bottom: 8px;
+  }
+}

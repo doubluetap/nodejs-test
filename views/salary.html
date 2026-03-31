@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tính lương</title>
+    <link rel="stylesheet" href="/salary.css">
+</head>
+<body>
+
+<h2>💰 Tính lương</h2>
+
+<div style="margin-bottom: 15px;">
+    <input type="number" id="month" placeholder="Tháng" min="1" max="12">
+    <input type="number" id="year" placeholder="Năm">
+    <button onclick="calculateSalary()">Tính lương</button>
+</div>
+
+<table border="1" width="100%">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Lương cơ bản</th>
+            <th>Công</th>
+            <th>Giờ tăng ca</th>
+            <th>Lương tăng ca</th>
+            <th>Tổng lương</th>
+        </tr>
+    </thead>
+    <tbody id="salaryTable"></tbody>
+</table>
+
+<script>
+async function calculateSalary() {
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+
+    if (!month || !year) {
+        alert("Vui lòng nhập tháng và năm");
+        return;
+    }
+
+    const res = await fetch('/salary/calculate', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ month, year })
+    });
+
+    const data = await res.json();
+
+    const table = document.getElementById("salaryTable");
+    table.innerHTML = "";
+
+    data.forEach(emp => {
+        table.innerHTML += `
+            <tr>
+                <td>${emp.name}</td>
+                <td>${emp.base_salary}</td>
+                <td>${emp.work_days}</td>
+                <td>${emp.overtime_hours}</td>
+                <td>${Math.round(emp.overtime_salary)}</td>
+                <td><b>${Math.round(emp.total)}</b></td>
+            </tr>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>
